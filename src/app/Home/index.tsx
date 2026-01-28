@@ -6,7 +6,8 @@ import { Input } from '@/components/Input';
 import { Filter } from '@/components/Filter';
 import { FilterStatus } from '@/types/FilterStatus';
 import { Item } from '@/components/Item';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { itemsStorage, ItemStorage } from '@/storage/ItemsStorage';
 
 const FILTER_STATUS: FilterStatus[] = [
   FilterStatus.PENDING,
@@ -22,7 +23,7 @@ export function Home() {
 
 const [filter, setFilter] = useState<FilterStatus>(FilterStatus.PENDING);
 const [description, setDescription] = useState('');
-const [items, setItems] = useState<any[]>([]);
+const [items, setItems] = useState<ItemStorage[]>([]);
 
 function handleAddItem(){
   if(!description.trim()){
@@ -35,7 +36,17 @@ function handleAddItem(){
   }
   setItems([newItem, ...items]);
 }
-
+async function getItems(){
+  try {
+    const response = await itemsStorage.get();
+    setItems(response);
+    
+  } catch (error) {
+    console.log("Erro ao buscar itens: ", error);
+    Alert.alert("Erro", "Não foi possível buscar os itens.");
+  }
+}
+useEffect(() => {}, [])
   return (
     <View style={styles.container}>
       <Image style={styles.logo} source={require('@/assets/logo.png')} />
