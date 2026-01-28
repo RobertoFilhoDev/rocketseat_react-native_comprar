@@ -3,6 +3,7 @@ import { styles } from "./styles";
 
 type Props = {
     title: string;
+    onPress?: () => void;
 }
 export function Button({ title, ...rest }: Props) {
     return (

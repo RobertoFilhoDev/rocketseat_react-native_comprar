@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Image, TouchableOpacity, Text, View, FlatList } from 'react-native';
+import { Image, TouchableOpacity, Text, View, FlatList, Alert } from 'react-native';
 import { Button } from '@/components/Button';
 import { styles } from './styles';
 import { Input } from '@/components/Input';
@@ -12,22 +12,39 @@ const FILTER_STATUS: FilterStatus[] = [
   FilterStatus.PENDING,
   FilterStatus.DONE,
 ]
-const ITEMS = [
-  { id: "1", status: FilterStatus.DONE, description: "Comprar pão" },
-  { id: "2", status: FilterStatus.PENDING, description: "Comprar leite" },
-  { id: "3", status: FilterStatus.PENDING, description: "Comprar queijo" },
-]
+//const ITEMS = [
+  //{ id: "1", status: FilterStatus.DONE, description: "Comprar pão" },
+  //{ id: "2", status: FilterStatus.PENDING, description: "Comprar leite" },
+  //{ id: "3", status: FilterStatus.PENDING, description: "Comprar queijo" },
+//]
 
 export function Home() {
 
 const [filter, setFilter] = useState<FilterStatus>(FilterStatus.PENDING);
+const [description, setDescription] = useState('');
+const [items, setItems] = useState<any[]>([]);
+
+function handleAddItem(){
+  if(!description.trim()){
+    return Alert.alert("Adicionar", "Informe a descrição para adicionar.");
+  }
+  const newItem = {
+    id: Math.random().toString(36).substring(2),
+    description: description,
+    status: FilterStatus.PENDING,
+  }
+  setItems([newItem, ...items]);
+}
 
   return (
     <View style={styles.container}>
       <Image style={styles.logo} source={require('@/assets/logo.png')} />
       <View style={styles.form}>
-        <Input placeholder="O que você precisa comprar?" />
-        <Button title="Adicionar" />
+        <Input 
+        placeholder="O que você precisa comprar?"
+        onChangeText={setDescription}
+        />
+        <Button title="Adicionar" onPress={handleAddItem} />
       </View>
       <View style={styles.content}>
         <View style={styles.header}>
@@ -45,7 +62,7 @@ const [filter, setFilter] = useState<FilterStatus>(FilterStatus.PENDING);
         </View>
 
         <FlatList
-          data={ITEMS}
+          data={items}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <Item
