@@ -25,7 +25,7 @@ const [filter, setFilter] = useState<FilterStatus>(FilterStatus.PENDING);
 const [description, setDescription] = useState('');
 const [items, setItems] = useState<ItemStorage[]>([]);
 
-function handleAddItem(){
+async function handleAddItem(){
   if(!description.trim()){
     return Alert.alert("Adicionar", "Informe a descrição para adicionar.");
   }
@@ -34,11 +34,12 @@ function handleAddItem(){
     description: description,
     status: FilterStatus.PENDING,
   }
-  setItems([newItem, ...items]);
+  await itemsStorage.add(newItem);
+  await itemsByStatus();
 }
-async function getItems(){
+async function itemsByStatus(){
   try {
-    const response = await itemsStorage.get();
+    const response = await itemsStorage.getByStatus(filter);
     setItems(response);
     
   } catch (error) {
@@ -46,7 +47,9 @@ async function getItems(){
     Alert.alert("Erro", "Não foi possível buscar os itens.");
   }
 }
-useEffect(() => {}, [])
+useEffect(() => {
+  itemsByStatus();
+}, [filter])
   return (
     <View style={styles.container}>
       <Image style={styles.logo} source={require('@/assets/logo.png')} />
