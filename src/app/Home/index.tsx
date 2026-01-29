@@ -51,6 +51,39 @@ async function itemsByStatus(){
     Alert.alert("Erro", "Não foi possível buscar os itens.");
   }
 }
+async function handleRemoveItem(id: string){
+  try {
+    await itemsStorage.remove(id);
+    await itemsByStatus();
+  } catch (error) {
+    console.log("Erro ao remover item: ", error);
+    Alert.alert("Remover", "Não foi possível remover o item.");
+  }
+}
+function handleClearItems(){
+  Alert.alert("Limpar", "Tem certeza que deseja limpar todos os itens?",[
+    {text: "Não", style: "cancel"},
+    {text:"Sim", onPress: () => onClearItems()}
+  ]);
+}
+async function onClearItems(){
+  try {
+    await itemsStorage.clear();
+    setItems([]);
+  } catch (error) {
+    console.log("Erro ao limpar itens: ", error);
+    Alert.alert("Erro", "Não foi possível limpar os itens.");
+  }
+}
+async function handleToogleStatus(id: string){
+  try {
+    await itemsStorage.toogleStatus(id);
+    await itemsByStatus();
+  } catch (error) {
+    console.log("Erro ao alterar status do item: ", error);
+    Alert.alert("Erro", "Não foi possível alterar o status do item.");
+  }
+}
 useEffect(() => {
   itemsByStatus();
 }, [filter])
@@ -75,7 +108,7 @@ useEffect(() => {
             onPress={() => setFilter(status)} 
             />
           ))}
-          <TouchableOpacity style={styles.clearButton}>
+          <TouchableOpacity style={styles.clearButton} onPress={handleClearItems}>
             <Text style={styles.clearButtonText}>Limpar</Text>
           </TouchableOpacity>
         </View>
@@ -86,8 +119,8 @@ useEffect(() => {
           renderItem={({ item }) => (
             <Item
               data={item}
-              onStatus={() => console.log('trocar status')}
-              onRemove={() => console.log('remover item')}
+              onStatus={() => handleToogleStatus(item.id)}
+              onRemove={() => handleRemoveItem(item.id)}
             />
           )}
           showsVerticalScrollIndicator={false}
